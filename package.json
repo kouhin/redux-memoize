@@ -1,0 +1,64 @@
+{
+  "name": "redux-memoize",
+  "version": "1.0.0",
+  "description": "Memoize action creator for redux, and let you dispatch common/thunk/promise/async action whenever you want to, without worrying about duplication",
+  "main": "lib/index.js",
+  "directories": {
+    "test": "jest"
+  },
+  "files": [
+    "src",
+    "lib"
+  ],
+  "scripts": {
+    "clean": "rimraf lib",
+    "build": "babel src --out-dir lib",
+    "lint": "eslint src test",
+    "posttest": "npm run lint",
+    "prepublish": "npm run clean && npm run test && npm run build",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kouhin/redux-memoize.git"
+  },
+  "homepage": "https://github.com/kouhin/redux-memoize",
+  "keywords": [
+    "redux",
+    "react",
+    "memoize",
+    "cache",
+    "thunk",
+    "middleware",
+    "thunk-middleware",
+    "cache-middleware",
+    "dedupe",
+    "duplication",
+    "duplicated",
+    "action",
+    "flux"
+  ],
+  "author": "Bin Hou <houbin217jz@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "babel-cli": "^6.23.0",
+    "babel-core": "^6.23.1",
+    "babel-eslint": "^7.1.1",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-latest": "^6.22.0",
+    "babel-preset-stage-0": "^6.22.0",
+    "chai": "^3.5.0",
+    "eslint-config-airbnb-deps": "^14.1.0",
+    "eslint-plugin-babel": "^4.0.1",
+    "jest": "^18.1.0",
+    "redux": "^3.6.0",
+    "redux-thunk": "^2.2.0",
+    "rimraf": "^2.5.4"
+  },
+  "dependencies": {
+    "lodash": "^4.17.4"
+  },
+  "jest": {
+    "testRegex": "(/test/.*\\.spec.js)$"
+  }
+}

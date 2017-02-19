@@ -5,7 +5,7 @@ Memoize action creator for [redux](http://redux.js.org), and let you dispatch co
 
 [![CircleCI](https://img.shields.io/circleci/project/github/kouhin/redux-memoize.svg)](https://circleci.com/gh/kouhin/redux-memoize/tree/develop)
 [![npm](https://img.shields.io/npm/v/redux-memoize.svg)](https://www.npmjs.com/package/redux-memoize)
-[![dependency status](https://david-dm.org/kouhin/react-router-hook.svg?style=flat-square)](https://david-dm.org/kouhin/react-router-hook)
+[![dependency status](https://david-dm.org/kouhin/redux-memoize.svg?style=flat-square)](https://david-dm.org/kouhin/redux-memoize)
 [![airbnb style](https://img.shields.io/badge/code_style-airbnb-blue.svg)](https://github.com/airbnb/javascript)
 
 ```js

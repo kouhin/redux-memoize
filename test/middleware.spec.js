@@ -1,7 +1,6 @@
 /* eslint import/no-extraneous-dependencies:0 */
 import { createStore, compose, applyMiddleware } from 'redux';
 import thunkMiddleware from 'redux-thunk';
-import lodashIsEqual from 'lodash/isEqual';
 
 import createMemoizeMiddleware, { memoize } from '../src/index';
 
@@ -34,8 +33,10 @@ describe('memoize', () => {
         memoize()(() => {});
       }).not.toThrow();
     });
+  });
 
-    it('memoized action creator must return an action with default options', () => {
+  describe('options', () => {
+    it('when options is not specified, must return an action without meta', () => {
       const args = [1, 2, '3'];
       expect(memoize()(actionCreator)(...args)).toEqual({
         type: '@redux-memoize/action',
@@ -43,16 +44,9 @@ describe('memoize', () => {
           fn: actionCreator,
           args,
         },
-        meta: {
-          ttl: 0,
-          enabled: true,
-          isEqual: lodashIsEqual,
-        },
       });
     });
-  });
 
-  describe('options', () => {
     it('memoized action creator returns an action with specified ttl', () => {
       const args = [1, 2, '3'];
       expect(memoize({
@@ -65,8 +59,6 @@ describe('memoize', () => {
         },
         meta: {
           ttl: 100,
-          enabled: true,
-          isEqual: lodashIsEqual,
         },
       });
 
@@ -81,8 +73,6 @@ describe('memoize', () => {
         },
         meta: {
           ttl,
-          enabled: true,
-          isEqual: lodashIsEqual,
         },
       });
     });
@@ -99,8 +89,6 @@ describe('memoize', () => {
           args,
         },
         meta: {
-          ttl: 0,
-          enabled: true,
           isEqual,
         },
       });
@@ -145,11 +133,6 @@ describe('middleware', () => {
             fn: () => ({ type: 'COMMON_ACTION' }),
             args: [1, 2],
           },
-          meta: {
-            ttl: 0,
-            enabled: true,
-            isEqual: lodashIsEqual,
-          },
         };
         const actionHandler = nextHandler((action) => {
           expect(action).toBeUndefined();
@@ -172,11 +155,6 @@ describe('middleware', () => {
           payload: {
             fn: () => originalAction,
             args: [1, 2],
-          },
-          meta: {
-            ttl: 0,
-            enabled: true,
-            isEqual: lodashIsEqual,
           },
         };
         const nextHandler1 = createMemoizeMiddleware()({
@@ -245,6 +223,139 @@ describe('unit test', () => {
         done();
       })
       .catch(done);
+  });
+
+  it('use with common action, disableTTL = false (Browser)', (done) => {
+    function counter(state = 0, action) {
+      switch (action.type) {
+        case 'INCREMENT':
+          return state + action.payload;
+        default:
+          return state;
+      }
+    }
+    const createThunk = memoize({ ttl: 50 })(num => ({
+      type: 'INCREMENT',
+      payload: num,
+    }));
+
+    const memoizeMiddleware = createMemoizeMiddleware({ disableTTL: false });
+
+    const store = applyMiddleware(
+      memoizeMiddleware,
+    )(configureStore)(counter);
+
+    const result1 = store.dispatch(createThunk(2));
+    const result2 = store.dispatch(createThunk(3));
+    const result3 = store.dispatch(createThunk(2));
+
+    expect(typeof result1.then).toBe('function');
+    expect(typeof result2.then).toBe('function');
+    expect(typeof result3.then).toBe('function');
+    expect(result1 === result3).toBeTruthy();
+    expect(result1 === result2).not.toBeTruthy();
+    expect(memoizeMiddleware.getAll().length).toBe(2);
+    expect(store.getState()).toBe(5);
+    new Promise((resolve) => {
+      setTimeout(() => {
+        store.dispatch(createThunk(2));
+        resolve();
+      }, 100);
+    })
+      .then(() => {
+        expect(store.getState()).toBe(7);
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            store.dispatch(createThunk(2));
+            resolve();
+          }, 10);
+        });
+      })
+      .then(() => {
+        expect(store.getState()).toBe(7);
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            store.dispatch(createThunk(2));
+            resolve();
+          }, 100);
+        });
+      })
+      .then(() => {
+        expect(store.getState()).toBe(9);
+        done();
+      })
+      .catch((err) => {
+        done(`ERROR: ${err}`);
+      });
+  });
+
+  it('use with common action with globalOptions, disableTTL = false (Browser)', (done) => {
+    function counter(state = 0, action) {
+      switch (action.type) {
+        case 'INCREMENT':
+          return state + action.payload;
+        default:
+          return state;
+      }
+    }
+    const createThunk = memoize()(num => ({
+      type: 'INCREMENT',
+      payload: num,
+    }));
+
+    const memoizeMiddleware = createMemoizeMiddleware({
+      disableTTL: false,
+      globalOptions: {
+        ttl: 50,
+      },
+    });
+
+    const store = applyMiddleware(
+      memoizeMiddleware,
+    )(configureStore)(counter);
+
+    const result1 = store.dispatch(createThunk(2));
+    const result2 = store.dispatch(createThunk(3));
+    const result3 = store.dispatch(createThunk(2));
+
+    expect(typeof result1.then).toBe('function');
+    expect(typeof result2.then).toBe('function');
+    expect(typeof result3.then).toBe('function');
+    expect(result1 === result3).toBeTruthy();
+    expect(result1 === result2).not.toBeTruthy();
+    expect(memoizeMiddleware.getAll().length).toBe(2);
+    expect(store.getState()).toBe(5);
+    new Promise((resolve) => {
+      setTimeout(() => {
+        store.dispatch(createThunk(2));
+        resolve();
+      }, 100);
+    })
+      .then(() => {
+        expect(store.getState()).toBe(7);
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            store.dispatch(createThunk(2));
+            resolve();
+          }, 10);
+        });
+      })
+      .then(() => {
+        expect(store.getState()).toBe(7);
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            store.dispatch(createThunk(2));
+            resolve();
+          }, 100);
+        });
+      })
+      .then(() => {
+        expect(store.getState()).toBe(9);
+        done();
+      })
+      .catch((err) => {
+        done(`ERROR: ${err}`);
+      });
   });
 
   it('use with redux-thunk', (done) => {

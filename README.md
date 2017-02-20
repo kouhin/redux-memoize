@@ -5,7 +5,7 @@ Memoize action creator for [redux](http://redux.js.org), and let you dispatch co
 
 [![CircleCI](https://img.shields.io/circleci/project/github/kouhin/redux-memoize.svg)](https://circleci.com/gh/kouhin/redux-memoize/tree/develop)
 [![npm](https://img.shields.io/npm/v/redux-memoize.svg)](https://www.npmjs.com/package/redux-memoize)
-[![dependency status](https://david-dm.org/kouhin/react-router-hook.svg?style=flat-square)](https://david-dm.org/kouhin/react-router-hook)
+[![dependency status](https://david-dm.org/kouhin/redux-memoize.svg?style=flat-square)](https://david-dm.org/kouhin/redux-memoize)
 [![airbnb style](https://img.shields.io/badge/code_style-airbnb-blue.svg)](https://github.com/airbnb/javascript)
 
 ```js
@@ -136,7 +136,6 @@ Memoize actionCreator and returns a memoized actionCreator. When dispatch action
 #### Arguments
 
 - `opts` _Object_
-  - **Default**: `{ ttl: 0, enabled: true, isEqual: lodash.isEqual }`
   - `ttl` _Number|Function_: The time to live for cached action creator. When `ttl` is a function, `getState` will be passed as argument, and it must returns a number.
   - `enabled` _Boolean|Function_: Whether use memorized action creator or not. When `false`, cache will be ignored and the result of original action creator will be dispatched without caching. When `enabled` is a function, `getState` will be passed argument, and it must returns a boolean.
   - `isEqual`: arguments of action creator will be used as the map cache key. It uses lodash.isEqual to find the existed cached action creator. You can customize this function.
@@ -153,6 +152,8 @@ Create a redux [middleware](http://redux.js.org/docs/advanced/Middleware.html).
 
 - `opts` _Object_
   - disableTTL _Boolean_: The default value is `true` on server and `false` on browser. By default, cached action creator will not be evicted by setTimeout with TTL on server in order to prevent memory leak. You can enable it for test purpose.
+  - globalOptions _Object_: Default opts for memorize().
+    - **Default**: `{ ttl: 0, enabled: true, isEqual: lodash.isEqual }`
 
 #### Returns
 

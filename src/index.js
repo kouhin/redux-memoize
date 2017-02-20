@@ -3,6 +3,12 @@ import lodashIsEqual from 'lodash/isEqual';
 
 const ACTION_TYPE = '@redux-memoize/action';
 
+const DEFAULT_META = {
+  ttl: 0,
+  enabled: true,
+  isEqual: lodashIsEqual,
+};
+
 function isPromise(v) {
   return v && typeof v.then === 'function';
 }
@@ -20,17 +26,21 @@ function deepGet(map, args, isEqual) {
   return null;
 }
 
-export default function createMemoizeMiddleware(options) {
+export default function createMemoizeMiddleware(options = {}) {
   const opts = {
     // default disableTTL is true on server side, to prevent memory leak (use GC to remove cache)
     disableTTL: !canUseDOM,
-    ...(options || {}),
+    ...options,
   };
   const cache = new Map();
   const middleware = ({ dispatch, getState }) => next => (action) => {
     if (typeof action === 'object' && action.type === ACTION_TYPE) {
       const { fn, args } = action.payload;
-      const { ttl, enabled, isEqual } = action.meta;
+      const { ttl, enabled, isEqual } = {
+        ...DEFAULT_META,
+        ...(options.globalOptions || {}),
+        ...(action.meta || {}),
+      };
       let taskCache = cache.get(fn);
       if (!taskCache) {
         taskCache = new Map();
@@ -75,16 +85,17 @@ export const memoize = options => (fn) => {
   if (typeof fn !== 'function') {
     throw new Error('Not a function');
   }
-  return (...args) => ({
-    type: ACTION_TYPE,
-    payload: {
-      fn,
-      args,
-    },
-    meta: {
-      ttl: (options && typeof options.ttl !== 'undefined') ? options.ttl : 0,
-      enabled: (options && typeof options.enabled !== 'undefined') ? options.enabled : true,
-      isEqual: (options && typeof options.isEqual !== 'undefined') ? options.isEqual : lodashIsEqual,
-    },
-  });
+  return (...args) => {
+    const action = {
+      type: ACTION_TYPE,
+      payload: {
+        fn,
+        args,
+      },
+    };
+    if (options) {
+      action.meta = options;
+    }
+    return action;
+  };
 };

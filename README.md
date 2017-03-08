@@ -33,7 +33,7 @@ const increment = () => {
 };
 
 // This is a memoized action creator.
-const memoizeIncrement = memoize({ ttl: 100 })(increment);
+const memoizeIncrement = memoize({ ttl: 100 }, increment);
 
 // Reducer
 function counter(state = 0, action) {
@@ -90,7 +90,7 @@ const fetchUserSuccess = (user) => {
 let creatorCalled = 0;
 let thunkCalled = 0;
 
-const fetchUserRequest = memoize({ ttl: 1000 })((username) => {
+const fetchUserRequest = memoize({ ttl: 1000 }, (username) => {
   creatorCalled += 1;
   return (dispatch, getState) => {
     thunkCalled += 1;
@@ -129,31 +129,32 @@ Promise.all([promise1, promise2])
 
 ## API
 
-### memoize(opts)(actionCreator)
+### memoize(opts, actionCreator)
 
 Memoize actionCreator and returns a memoized actionCreator. When dispatch action that created by memorized actionCreator, it will returns a Promise.
 
 #### Arguments
 
-- `opts` _Object_
+- `opts` _Object | number <optional>_
   - `ttl` _Number|Function_: The time to live for cached action creator. When `ttl` is a function, `getState` will be passed as argument, and it must returns a number.
   - `enabled` _Boolean|Function_: Whether use memorized action creator or not. When `false`, cache will be ignored and the result of original action creator will be dispatched without caching. When `enabled` is a function, `getState` will be passed argument, and it must returns a boolean.
   - `isEqual`: arguments of action creator will be used as the map cache key. It uses lodash.isEqual to find the existed cached action creator. You can customize this function.
+  - If `opts` is a number, the numbrer specifies the ttl.
 
 #### Returns
 
 - (Promise): will be resolved with the result of original actionCreator.
 
-### createMemoizeMiddleware(opts)
+### createMemoizeMiddleware(globalOpts, disableTTL)
 
 Create a redux [middleware](http://redux.js.org/docs/advanced/Middleware.html).
 
 #### Arguments
 
-- `opts` _Object_
-  - disableTTL _Boolean_: The default value is `true` on server and `false` on browser. By default, cached action creator will not be evicted by setTimeout with TTL on server in order to prevent memory leak. You can enable it for test purpose.
-  - globalOptions _Object_: Default opts for memorize().
-    - **Default**: `{ ttl: 0, enabled: true, isEqual: lodash.isEqual }`
+- `globalOpts` _Object <optional>_
+  - _Object_: Default opts for memorize(). 
+  - **Default**: `{ ttl: 0, enabled: true, isEqual: lodash.isEqual }`]
+  - There is another options `disableTTL`. The default value is `true` on server and `false` on browser. By default, cached action creator will not be evicted by setTimeout with TTL on server in order to prevent memory leak. You can enable it for test purpose.
 
 #### Returns
 

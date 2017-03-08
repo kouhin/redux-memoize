@@ -18,19 +18,15 @@ describe('memoize', () => {
   }
 
   describe('memoize()', () => {
-    it('memoize() must return a function', () => {
-      expect(typeof memoize()).toBe('function');
-    });
-
     it('must throw if argument is not a function', () => {
       expect(() => {
-        memoize()({});
+        memoize({});
       }).toThrow();
       expect(() => {
-        memoize()();
+        memoize();
       }).toThrow();
       expect(() => {
-        memoize()(() => {});
+        memoize(() => {});
       }).not.toThrow();
     });
   });
@@ -38,7 +34,7 @@ describe('memoize', () => {
   describe('options', () => {
     it('when options is not specified, must return an action without meta', () => {
       const args = [1, 2, '3'];
-      expect(memoize()(actionCreator)(...args)).toEqual({
+      expect(memoize(actionCreator)(...args)).toEqual({
         type: '@redux-memoize/action',
         payload: {
           fn: actionCreator,
@@ -51,7 +47,7 @@ describe('memoize', () => {
       const args = [1, 2, '3'];
       expect(memoize({
         ttl: 100,
-      })(actionCreator)(...args)).toEqual({
+      }, actionCreator)(...args)).toEqual({
         type: '@redux-memoize/action',
         payload: {
           fn: actionCreator,
@@ -65,7 +61,7 @@ describe('memoize', () => {
       const ttl = getState => getState().ttl;
       expect(memoize({
         ttl,
-      })(actionCreator)(...args)).toEqual({
+      }, actionCreator)(...args)).toEqual({
         type: '@redux-memoize/action',
         payload: {
           fn: actionCreator,
@@ -82,7 +78,7 @@ describe('memoize', () => {
       const isEqual = (args1, args2) => (args1 === args2);
       expect(memoize({
         isEqual,
-      })(actionCreator)(...args)).toEqual({
+      }, actionCreator)(...args)).toEqual({
         type: '@redux-memoize/action',
         payload: {
           fn: actionCreator,
@@ -192,7 +188,7 @@ describe('unit test', () => {
           return state;
       }
     }
-    const createThunk = memoize({ ttl: 200 })((num) => {
+    const createThunk = memoize({ ttl: 200 }, (num) => {
       thunkCreatorCalled += 1;
       return {
         type: 'INCREMENT',
@@ -234,7 +230,7 @@ describe('unit test', () => {
           return state;
       }
     }
-    const createThunk = memoize({ ttl: 50 })(num => ({
+    const createThunk = memoize({ ttl: 50 }, num => ({
       type: 'INCREMENT',
       payload: num,
     }));
@@ -298,16 +294,14 @@ describe('unit test', () => {
           return state;
       }
     }
-    const createThunk = memoize()(num => ({
+    const createThunk = memoize(num => ({
       type: 'INCREMENT',
       payload: num,
     }));
 
     const memoizeMiddleware = createMemoizeMiddleware({
       disableTTL: false,
-      globalOptions: {
-        ttl: 50,
-      },
+      ttl: 50,
     });
 
     const store = applyMiddleware(
@@ -371,7 +365,7 @@ describe('unit test', () => {
           return state;
       }
     }
-    const createThunk = memoize({ ttl: 200 })((num) => {
+    const createThunk = memoize({ ttl: 200 }, (num) => {
       thunkCreatorCalled += 1;
       return (dispatch) => {
         thunkCalled += 1;
@@ -428,7 +422,7 @@ describe('unit test', () => {
           return state;
       }
     }
-    const createThunk = memoize({ ttl: 100 })((num) => {
+    const createThunk = memoize({ ttl: 100 }, (num) => {
       thunkCreatorCalled += 1;
       return (dispatch) => {
         thunkCalled += 1;
@@ -526,7 +520,7 @@ describe('unit test', () => {
         const enabled = getState().memoizeEnabled;
         return enabled === undefined ? true : enabled;
       },
-    })((num) => {
+    }, (num) => {
       incrementCalled += 1;
       return {
         type: 'INCREMENT',
@@ -584,7 +578,7 @@ describe('unit test', () => {
         const ttl = getState().ttl;
         return typeof ttl === 'undefined' ? 0 : ttl;
       },
-    })((num) => {
+    }, (num) => {
       incrementCalled += 1;
       return {
         type: 'INCREMENT',

@@ -4,7 +4,7 @@ import lodashIsEqual from 'lodash/isEqual';
 const ACTION_TYPE = '@redux-memoize/action';
 
 const DEFAULT_META = {
-  ttl: 0,
+  ttl: 200,
   enabled: true,
   isEqual: lodashIsEqual,
 };
@@ -27,18 +27,19 @@ function deepGet(map, args, isEqual) {
 }
 
 export default function createMemoizeMiddleware(options = {}) {
-  const opts = {
+  const {
     // default disableTTL is true on server side, to prevent memory leak (use GC to remove cache)
-    disableTTL: !canUseDOM,
-    ...options,
-  };
+    disableTTL = !canUseDOM,
+    ...globalOptions
+  } = options;
+
   const cache = new Map();
   const middleware = ({ dispatch, getState }) => next => (action) => {
     if (typeof action === 'object' && action.type === ACTION_TYPE) {
       const { fn, args } = action.payload;
       const { ttl, enabled, isEqual } = {
         ...DEFAULT_META,
-        ...(options.globalOptions || {}),
+        ...globalOptions,
         ...(action.meta || {}),
       };
       let taskCache = cache.get(fn);
@@ -55,7 +56,7 @@ export default function createMemoizeMiddleware(options = {}) {
           const finalTTL = typeof ttl === 'function' ? ttl(getState) : ttl;
           if (finalTTL) {
             taskCache.set(args, task);
-            if (!opts.disableTTL) {
+            if (!disableTTL) {
               setTimeout(() => {
                 taskCache.delete(args);
               }, finalTTL);
@@ -81,15 +82,24 @@ export default function createMemoizeMiddleware(options = {}) {
   return middleware;
 }
 
-export const memoize = options => (fn) => {
-  if (typeof fn !== 'function') {
+export function memoize(opts, fn) {
+  let func;
+  let options;
+  if (arguments.length < 2) {
+    options = null;
+    func = opts;
+  } else {
+    options = typeof opts === 'object' ? opts : { ttl: opts };
+    func = fn;
+  }
+  if (typeof func !== 'function') {
     throw new Error('Not a function');
   }
   return (...args) => {
     const action = {
       type: ACTION_TYPE,
       payload: {
-        fn,
+        fn: func,
         args,
       },
     };
@@ -98,4 +108,4 @@ export const memoize = options => (fn) => {
     }
     return action;
   };
-};
+}

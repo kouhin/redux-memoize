@@ -69,7 +69,7 @@ console.info(promise1 === promise2); OUTPUT: true
 setTimeout(() => {
   store.dispatch(memoizeIncrement());
   console.info(store.getState()); // OUTPUT: 4
-}, 200);
+}, 500);
 ```
 
 **It works perfectly with [redux-thunk](https://github.com/gaearon/redux-thunk)**
@@ -145,7 +145,7 @@ Memoize actionCreator and returns a memoized actionCreator. When dispatch action
 
 - (Promise): will be resolved with the result of original actionCreator.
 
-### createMemoizeMiddleware(globalOpts, disableTTL)
+### createMemoizeMiddleware(globalOpts)
 
 Create a redux [middleware](http://redux.js.org/docs/advanced/Middleware.html).
 
@@ -153,7 +153,7 @@ Create a redux [middleware](http://redux.js.org/docs/advanced/Middleware.html).
 
 - `globalOpts` _Object <optional>_
   - _Object_: Default opts for memorize(). 
-  - **Default**: `{ ttl: 0, enabled: true, isEqual: lodash.isEqual }`]
+  - **Default**: `{ ttl: 200, enabled: true, isEqual: lodash.isEqual }`]
   - There is another options `disableTTL`. The default value is `true` on server and `false` on browser. By default, cached action creator will not be evicted by setTimeout with TTL on server in order to prevent memory leak. You can enable it for test purpose.
 
 #### Returns

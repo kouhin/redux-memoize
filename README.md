@@ -47,7 +47,7 @@ function counter(state = 0, action) {
 
 const store = createStore(
   counter,
-  applyMiddleware(createMemoizeMiddleware()),
+  applyMiddleware(createMemoizeMiddleware({ ttl: 200 })),
 );
 
 store.dispatch(increment());
@@ -104,7 +104,7 @@ const fetchUserRequest = memoize({ ttl: 1000 }, (username) => {
 
 const store = createStore(
   rootReducer,
-  applyMiddleware(createMemoizeMiddleware(), thunk),
+  applyMiddleware(createMemoizeMiddleware({ ttl: 200 }), thunk),
 );
 
 // Component1
@@ -152,8 +152,8 @@ Create a redux [middleware](http://redux.js.org/docs/advanced/Middleware.html).
 #### Arguments
 
 - `globalOpts` _Object <optional>_
-  - _Object_: Default opts for memorize(). 
-  - **Default**: `{ ttl: 200, enabled: true, isEqual: lodash.isEqual }`]
+  - _Object_: Default opts for memorize().
+  - **Default**: `{ ttl:0, enabled: true, isEqual: lodash.isEqual }`]. **ttl is REQUIRED, You SHOULD set a ttl > 0 in millisecond**
   - There is another options `disableTTL`. The default value is `true` on server and `false` on browser. By default, cached action creator will not be evicted by setTimeout with TTL on server in order to prevent memory leak. You can enable it for test purpose.
 
 #### Returns

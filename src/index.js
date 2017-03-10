@@ -3,7 +3,7 @@ import lodashIsEqual from 'lodash/isEqual';
 const ACTION_TYPE = '@redux-memoize/action';
 
 const DEFAULT_META = {
-  ttl: 200,
+  ttl: 0,
   enabled: true,
   isEqual: lodashIsEqual,
 };
@@ -28,8 +28,11 @@ function deepGet(map, args, isEqual) {
 }
 
 export default function createMemoizeMiddleware(options = {}) {
+  if (canUseDOM && options.ttl === undefined) {
+    throw new Error('[createMemoizeMiddleware(globalOptions)] globalOptions.ttl is REQUIRED');
+  }
   const {
-    // default disableTTL is true on server side, to prevent memory leak (use GC to remove cache)
+    // default disableTTL is true on server side, to prevent memory leak (use GC to evict cache)
     disableTTL = !canUseDOM,
     ...globalOptions
   } = options;

@@ -1,10 +1,9 @@
-/* eslint no-restricted-syntax:0 */
 import lodashIsEqual from 'lodash/isEqual';
 
 const ACTION_TYPE = '@redux-memoize/action';
 
 const DEFAULT_META = {
-  ttl: 200,
+  ttl: 0,
   enabled: true,
   isEqual: lodashIsEqual,
 };
@@ -18,7 +17,9 @@ const canUseDOM = !!(
 );
 
 function deepGet(map, args, isEqual) {
-  for (const key of map.keys()) {
+  const keys = Array.from(map.keys());
+  for (let i = 0, len = keys.length; i < len; i += 1) {
+    const key = keys[i];
     if (isEqual(key, args)) {
       return map.get(key);
     }
@@ -27,8 +28,11 @@ function deepGet(map, args, isEqual) {
 }
 
 export default function createMemoizeMiddleware(options = {}) {
+  if (canUseDOM && options.ttl === undefined) {
+    throw new Error('[createMemoizeMiddleware(globalOptions)] globalOptions.ttl is REQUIRED');
+  }
   const {
-    // default disableTTL is true on server side, to prevent memory leak (use GC to remove cache)
+    // default disableTTL is true on server side, to prevent memory leak (use GC to evict cache)
     disableTTL = !canUseDOM,
     ...globalOptions
   } = options;
@@ -72,11 +76,12 @@ export default function createMemoizeMiddleware(options = {}) {
   };
   middleware.getAll = () => {
     const result = [];
-    for (const fnCache of cache.values()) {
-      for (const value of fnCache.values()) {
+    const cacheValues = Array.from(cache.values());
+    cacheValues.forEach((fnCache) => {
+      Array.from(fnCache.values()).forEach((value) => {
         result.push(value);
-      }
-    }
+      });
+    });
     return result;
   };
   return middleware;

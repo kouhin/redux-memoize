@@ -6,7 +6,7 @@ import createMemoizeMiddleware, { memoize } from '../src/index';
 
 function configureStore(reducer) {
   return compose(
-    applyMiddleware(createMemoizeMiddleware(), thunkMiddleware),
+    applyMiddleware(createMemoizeMiddleware({ ttl: 200 }), thunkMiddleware),
   )(createStore)(reducer);
 }
 
@@ -96,7 +96,15 @@ describe('memoize', () => {
 describe('middleware', () => {
   const doDispatch = () => {};
   const doGetState = () => {};
-  const nextHandler = createMemoizeMiddleware()({ dispatch: doDispatch, getState: doGetState });
+  const nextHandler = createMemoizeMiddleware({
+    ttl: 200,
+  })({ dispatch: doDispatch, getState: doGetState });
+
+  it('must throw an error when ttl is not passed', () => {
+    expect(() => {
+      createMemoizeMiddleware();
+    }).toThrow();
+  });
 
   it('must return a function to handle next', () => {
     expect(typeof nextHandler).toBe('function');
@@ -153,7 +161,7 @@ describe('middleware', () => {
             args: [1, 2],
           },
         };
-        const nextHandler1 = createMemoizeMiddleware()({
+        const nextHandler1 = createMemoizeMiddleware({ ttl: 200 })({
           dispatch: (action) => {
             expect(action).toBe(originalAction);
             done();
@@ -170,7 +178,7 @@ describe('middleware', () => {
   describe('handle errors', () => {
     it('must throw if argument is not a function', () => {
       expect(() => {
-        createMemoizeMiddleware()();
+        createMemoizeMiddleware({ ttl: 200 })();
       }).toThrow();
     });
   });
@@ -196,7 +204,7 @@ describe('unit test', () => {
       };
     });
 
-    const memoizeMiddleware = createMemoizeMiddleware();
+    const memoizeMiddleware = createMemoizeMiddleware({ ttl: 200 });
 
     const store = applyMiddleware(
       memoizeMiddleware,
@@ -235,7 +243,7 @@ describe('unit test', () => {
       payload: num,
     }));
 
-    const memoizeMiddleware = createMemoizeMiddleware({ disableTTL: false });
+    const memoizeMiddleware = createMemoizeMiddleware({ ttl: 200, disableTTL: false });
 
     const store = applyMiddleware(
       memoizeMiddleware,
@@ -381,7 +389,7 @@ describe('unit test', () => {
       };
     });
 
-    const memoizeMiddleware = createMemoizeMiddleware();
+    const memoizeMiddleware = createMemoizeMiddleware({ ttl: 200 });
 
     const store = applyMiddleware(
       thunkMiddleware,
@@ -439,6 +447,7 @@ describe('unit test', () => {
     });
 
     const memoizeMiddleware = createMemoizeMiddleware({
+      ttl: 200,
       disableTTL: false,
     });
 
@@ -536,6 +545,7 @@ describe('unit test', () => {
     }
 
     const memoizeMiddleware = createMemoizeMiddleware({
+      ttl: 200,
       disableTTL: false,
     });
 
@@ -594,6 +604,7 @@ describe('unit test', () => {
     }
 
     const memoizeMiddleware = createMemoizeMiddleware({
+      ttl: 200,
       disableTTL: false,
     });
 

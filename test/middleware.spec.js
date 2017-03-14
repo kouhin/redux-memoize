@@ -29,6 +29,10 @@ describe('memoize', () => {
         memoize(() => {});
       }).not.toThrow();
     });
+    it('original function should be exposed', () => {
+      const creator = () => {};
+      expect(memoize(creator).unmemoized).toBe(creator);
+    });
   });
 
   describe('options', () => {

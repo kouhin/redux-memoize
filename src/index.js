@@ -100,7 +100,7 @@ export function memoize(opts, fn) {
   if (typeof func !== 'function') {
     throw new Error('Not a function');
   }
-  return (...args) => {
+  const memoized = (...args) => {
     const action = {
       type: ACTION_TYPE,
       payload: {
@@ -113,4 +113,6 @@ export function memoize(opts, fn) {
     }
     return action;
   };
+  memoized.unmemoized = func;
+  return memoized;
 }

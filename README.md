@@ -143,7 +143,13 @@ Memoize actionCreator and returns a memoized actionCreator. When dispatch action
 
 #### Returns
 
-- (Promise): will be resolved with the result of original actionCreator.
+- (Function): memoized actionCreator. Original action creator can be accessed by `memoize(actionCreator).unmemoized`, e.g.
+
+``` javascript
+const actionCreator = () => {};
+const memoized = memoize(actionCreator);
+console.info(memoized.unmemoized === actionCreator);
+```
 
 ### createMemoizeMiddleware(globalOpts)
 
@@ -170,7 +176,7 @@ In 2016, I wrote a library called [redux-dataloader](https://github.com/kouhin/r
 
 ## Why not memoize utils such as _.memoize?
 
-Of course memoize utils such as lodash/memoize can solve duplicated requests on browser. But it may cause memory problem on server side. On the server side, we will create a new store for each request. Since this library holds cache in middleware that is created with createStore, cache will be cleaned up after request by GC. It won't cause memory leak problem. What's more, it supports dynamic `ttl` and `enabled` by `store.getState()`, so you can change these opions from remote api when needed.
+Of course memoize utils such as lodash/memoize can solve duplicated requests on browser. However, `_.memoize` only puts the result of action creator into cache, and the result of `dispatch()` cannot be cached. When the result of a action creator is a function (thunk), the function will still be executed by thunk middleware. It means `_.memoize` can't cache thunk, and the async action will still be duplicated. Besides, it may cause memory problem on server side. On the server side, we will create a new store for each request. Since this library holds cache in middleware that is created with createStore, cache will be cleaned up after request by GC. It won't cause memory leak problem. What's more, it supports dynamic `ttl` and `enabled` by `store.getState()`, so you can change these opions from remote api when needed.
 
 ## LICENSE
 

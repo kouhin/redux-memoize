@@ -1,6 +1,6 @@
 {
   "name": "redux-memoize",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Memoize action creator for redux, and let you dispatch common/thunk/promise/async action whenever you want to, without worrying about duplication",
   "main": "lib/index.js",
   "directories": {

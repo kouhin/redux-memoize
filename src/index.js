@@ -37,7 +37,7 @@ export default function createMemoizeMiddleware(options = {}) {
     ...globalOptions
   } = options;
 
-  const cache = new Map();
+  const cache = options.cache || new WeakMap();
   const middleware = ({ dispatch, getState }) => next => (action) => {
     if (typeof action === 'object' && action.type === ACTION_TYPE) {
       const { fn, args } = action.payload;
@@ -74,16 +74,7 @@ export default function createMemoizeMiddleware(options = {}) {
     }
     return next(action);
   };
-  middleware.getAll = () => {
-    const result = [];
-    const cacheValues = Array.from(cache.values());
-    cacheValues.forEach((fnCache) => {
-      Array.from(fnCache.values()).forEach((value) => {
-        result.push(value);
-      });
-    });
-    return result;
-  };
+  middleware.cache = cache;
   return middleware;
 }
 

@@ -10,6 +10,17 @@ function configureStore(reducer) {
   )(createStore)(reducer);
 }
 
+function getAll(cache) {
+  const result = [];
+  const cacheValues = Array.from(cache.values());
+  cacheValues.forEach((fnCache) => {
+    Array.from(fnCache.values()).forEach((value) => {
+      result.push(value);
+    });
+  });
+  return result;
+}
+
 describe('memoize', () => {
   function actionCreator() {
     return {
@@ -208,7 +219,7 @@ describe('unit test', () => {
       };
     });
 
-    const memoizeMiddleware = createMemoizeMiddleware({ ttl: 200 });
+    const memoizeMiddleware = createMemoizeMiddleware({ ttl: 200, cache: new Map() });
 
     const store = applyMiddleware(
       memoizeMiddleware,
@@ -223,8 +234,8 @@ describe('unit test', () => {
     expect(typeof result3.then).toBe('function');
     expect(result1 === result3).toBeTruthy();
     expect(result1 === result2).not.toBeTruthy();
-    expect(memoizeMiddleware.getAll().length).toBe(2);
-    Promise.all(memoizeMiddleware.getAll())
+    expect(getAll(memoizeMiddleware.cache).length).toBe(2);
+    Promise.all(getAll(memoizeMiddleware.cache))
       .then(() => {
         expect(thunkCreatorCalled).toBe(2);
         expect(store.getState()).toBe(5);
@@ -247,7 +258,11 @@ describe('unit test', () => {
       payload: num,
     }));
 
-    const memoizeMiddleware = createMemoizeMiddleware({ ttl: 200, disableTTL: false });
+    const memoizeMiddleware = createMemoizeMiddleware({
+      ttl: 200,
+      disableTTL: false,
+      cache: new Map(),
+    });
 
     const store = applyMiddleware(
       memoizeMiddleware,
@@ -262,7 +277,7 @@ describe('unit test', () => {
     expect(typeof result3.then).toBe('function');
     expect(result1 === result3).toBeTruthy();
     expect(result1 === result2).not.toBeTruthy();
-    expect(memoizeMiddleware.getAll().length).toBe(2);
+    expect(getAll(memoizeMiddleware.cache).length).toBe(2);
     expect(store.getState()).toBe(5);
     new Promise((resolve) => {
       setTimeout(() => {
@@ -314,6 +329,7 @@ describe('unit test', () => {
     const memoizeMiddleware = createMemoizeMiddleware({
       disableTTL: false,
       ttl: 50,
+      cache: new Map(),
     });
 
     const store = applyMiddleware(
@@ -329,7 +345,7 @@ describe('unit test', () => {
     expect(typeof result3.then).toBe('function');
     expect(result1 === result3).toBeTruthy();
     expect(result1 === result2).not.toBeTruthy();
-    expect(memoizeMiddleware.getAll().length).toBe(2);
+    expect(getAll(memoizeMiddleware.cache).length).toBe(2);
     expect(store.getState()).toBe(5);
     new Promise((resolve) => {
       setTimeout(() => {
@@ -393,7 +409,7 @@ describe('unit test', () => {
       };
     });
 
-    const memoizeMiddleware = createMemoizeMiddleware({ ttl: 200 });
+    const memoizeMiddleware = createMemoizeMiddleware({ ttl: 200, cache: new Map() });
 
     const store = applyMiddleware(
       thunkMiddleware,
@@ -409,8 +425,8 @@ describe('unit test', () => {
     expect(typeof result3.then).toBe('function');
     expect(result1 === result3).toBeTruthy();
     expect(result1 === result2).not.toBeTruthy();
-    expect(memoizeMiddleware.getAll().length).toBe(2);
-    Promise.all(memoizeMiddleware.getAll())
+    expect(getAll(memoizeMiddleware.cache).length).toBe(2);
+    Promise.all(getAll(memoizeMiddleware.cache))
       .then(() => {
         expect(thunkCreatorCalled).toBe(2);
         expect(thunkCalled).toBe(2);

@@ -1,6 +1,8 @@
 redux-memoize
 =============
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/kouhin/redux-memoize.svg)](https://greenkeeper.io/)
+
 Memoize action creator for [redux](http://redux.js.org), and let you dispatch common/thunk/promise/async action whenever you want to, without worrying about duplication.
 
 [![CircleCI](https://img.shields.io/circleci/project/github/kouhin/redux-memoize.svg)](https://circleci.com/gh/kouhin/redux-memoize/tree/develop)
@@ -161,6 +163,7 @@ Create a redux [middleware](http://redux.js.org/docs/advanced/Middleware.html).
   - _Object_: Default opts for memorize().
   - **Default**: `{ ttl:0, enabled: true, isEqual: lodash.isEqual }`]. **ttl is REQUIRED, You SHOULD set a ttl > 0 in millisecond**
   - There is another options `disableTTL`. The default value is `true` on server and `false` on browser. By default, cached action creator will not be evicted by setTimeout with TTL on server in order to prevent memory leak. You can enable it for test purpose.
+  - You can pass a customized cache by `cache` instead of default cache `new WeakMap()`.
 
 #### Returns
 

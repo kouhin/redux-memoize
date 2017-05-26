@@ -1,6 +1,8 @@
 redux-memoize
 =============
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/kouhin/redux-memoize.svg)](https://greenkeeper.io/)
+
 Memoize action creator for [redux](http://redux.js.org), and let you dispatch common/thunk/promise/async action whenever you want to, without worrying about duplication.
 
 [![CircleCI](https://img.shields.io/circleci/project/github/kouhin/redux-memoize.svg)](https://circleci.com/gh/kouhin/redux-memoize/tree/develop)

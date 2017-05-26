@@ -48,9 +48,9 @@
     "babel-preset-env": "^1.2.1",
     "babel-preset-stage-0": "^6.22.0",
     "chai": "^3.5.0",
-    "eslint-config-airbnb-deps": "^14.1.0",
+    "eslint-config-airbnb-deps": "^15.0.1",
     "eslint-plugin-babel": "^4.1.1",
-    "jest": "^19.0.2",
+    "jest": "^20.0.3",
     "redux": "^3.6.0",
     "redux-thunk": "^2.2.0",
     "rimraf": "^2.6.1"

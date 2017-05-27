@@ -74,7 +74,6 @@ export default function createMemoizeMiddleware(options = {}) {
     }
     return next(action);
   };
-  middleware.cache = cache;
   return middleware;
 }
 

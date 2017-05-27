@@ -1,6 +1,6 @@
 {
   "name": "redux-memoize",
-  "version": "2.3.0",
+  "version": "2.3.1",
   "description": "Memoize action creator for redux, and let you dispatch common/thunk/promise/async action whenever you want to, without worrying about duplication",
   "main": "lib/index.js",
   "directories": {
@@ -48,7 +48,7 @@
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-env": "^1.2.1",
     "babel-preset-stage-0": "^6.22.0",
-    "chai": "^3.5.0",
+    "chai": "^4.0.0",
     "eslint": "^3.19.0",
     "eslint-config-airbnb-deps": "^15.0.1",
     "eslint-plugin-babel": "^4.1.1",
